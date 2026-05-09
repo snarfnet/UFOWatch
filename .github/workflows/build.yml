@@ -91,8 +91,16 @@ jobs:
 
     - name: Upload to App Store Connect
       run: |
+        echo "=== Export directory contents ==="
+        ls -la build/export/
+        IPA=$(find build/export -name "*.ipa" | head -1)
+        if [ -z "$IPA" ]; then
+          echo "ERROR: No IPA file found in build/export/"
+          exit 1
+        fi
+        echo "Found IPA: $IPA"
         xcrun altool --upload-app \
-          -f build/export/UFOWatch.ipa \
+          -f "$IPA" \
           -t ios \
           --apiKey WDXGY9WX55 \
           --apiIssuer 2be0734f-943a-4d61-9dc9-5d9045c46fec \
