@@ -7,128 +7,134 @@ struct StatusView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Radar animation
-                    ZStack {
-                        Circle()
-                            .stroke(.green.opacity(0.1), lineWidth: 1)
-                            .frame(width: 200, height: 200)
-                        Circle()
-                            .stroke(.green.opacity(0.2), lineWidth: 1)
-                            .frame(width: 150, height: 150)
-                        Circle()
-                            .stroke(.green.opacity(0.3), lineWidth: 1)
-                            .frame(width: 100, height: 100)
-                        Circle()
-                            .fill(.green)
-                            .frame(width: 12, height: 12)
+            ZStack {
+                PursueBackground()
 
-                        if isChecking {
-                            Circle()
-                                .stroke(.green.opacity(0.5), lineWidth: 2)
-                                .frame(width: 200, height: 200)
-                                .scaleEffect(isChecking ? 1.5 : 1.0)
-                                .opacity(isChecking ? 0 : 1)
-                                .animation(.easeOut(duration: 1.5).repeatForever(autoreverses: false), value: isChecking)
-                        }
+                ScrollView {
+                    VStack(spacing: 18) {
+                        monitorHeader
+                        statusGrid
+                        resultPanel
+                        actionButtons
+
+                        BannerAdView()
+                            .frame(height: 50)
+                            .padding(.top, 2)
                     }
-                    .padding(.top, 30)
-
-                    Text("PURSUE MONITOR")
-                        .font(.headline)
-                        .foregroundStyle(.green)
-
-                    Text("Presidential Unsealing and Reporting\nSystem for UAP Encounters")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-
-                    // Status cards
-                    VStack(spacing: 12) {
-                        StatusCard(
-                            icon: "clock.arrow.circlepath",
-                            title: "最終チェック",
-                            value: lastCheck
-                        )
-
-                        StatusCard(
-                            icon: "folder",
-                            title: "公開リリース数",
-                            value: "\(ReleaseData.allReleases.count) リリース"
-                        )
-
-                        StatusCard(
-                            icon: "photo.on.rectangle.angled",
-                            title: "公開資料数",
-                            value: "\(ReleaseData.allItems.count) 件"
-                        )
-
-                        StatusCard(
-                            icon: "globe.asia.australia",
-                            title: "公式サイト",
-                            value: "war.gov/UFO"
-                        )
-                    }
-                    .padding(.horizontal)
-
-                    if let result = checkResult {
-                        Text(result)
-                            .font(.subheadline)
-                            .foregroundStyle(result.contains("新しい") ? .green : .secondary)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color(red: 0.1, green: 0.1, blue: 0.15))
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .padding(.horizontal)
-                    }
-
-                    Button {
-                        checkNow()
-                    } label: {
-                        HStack {
-                            if isChecking {
-                                ProgressView()
-                                    .tint(.black)
-                                    .scaleEffect(0.8)
-                            }
-                            Text(isChecking ? "チェック中..." : "今すぐチェック")
-                                .fontWeight(.semibold)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(.green)
-                        .foregroundStyle(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
-                    .disabled(isChecking)
-                    .padding(.horizontal)
-
-                    Button {
-                        NotificationHelper.requestPermission()
-                    } label: {
-                        HStack {
-                            Image(systemName: "bell.badge")
-                            Text("通知を有効にする")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(red: 0.1, green: 0.1, blue: 0.15))
-                        .foregroundStyle(.green)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                    }
-                    .padding(.horizontal)
-
-                    BannerAdView()
-                        .frame(height: 50)
-                        .padding(.top, 8)
+                    .padding(16)
                 }
             }
-            .background(Color(red: 0.05, green: 0.05, blue: 0.1))
-            .navigationTitle("ステータス")
+            .navigationTitle("監視")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbarBackground(Color(red: 0.05, green: 0.05, blue: 0.1), for: .navigationBar)
+            .toolbarBackground(PursueTheme.void, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
+        }
+    }
+
+    private var monitorHeader: some View {
+        ZStack(alignment: .bottom) {
+            CinematicStill(cornerRadius: 8)
+                .frame(height: 330)
+                .overlay(Color.black.opacity(0.18))
+            VStack(spacing: 5) {
+                Text("PURSUE MONITOR")
+                    .font(.system(.title3, design: .monospaced).weight(.black))
+                    .foregroundStyle(PursueTheme.lime)
+                Text("米国公式UFO公開情報を巡回")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(PursueTheme.ink)
+                Text("新しい資料を検知したら通知で知らせます。")
+                    .font(.caption)
+                    .foregroundStyle(PursueTheme.muted)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity)
+            .background(
+                LinearGradient(
+                    colors: [PursueTheme.void.opacity(0), PursueTheme.void.opacity(0.82)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            )
+        }
+        .frame(maxWidth: .infinity)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(.white.opacity(0.12), lineWidth: 1)
+        )
+    }
+
+    private var statusGrid: some View {
+        VStack(spacing: 10) {
+            StatusCard(icon: "clock.arrow.circlepath", title: "最終チェック", value: lastCheck)
+            StatusCard(icon: "folder", title: "公開リリース", value: "\(ReleaseData.allReleases.count) 件")
+            StatusCard(icon: "photo.on.rectangle.angled", title: "登録資料", value: "\(ReleaseData.allItems.count) 点")
+            StatusCard(icon: "globe.americas.fill", title: "巡回先", value: "war.gov/UFO")
+        }
+    }
+
+    @ViewBuilder
+    private var resultPanel: some View {
+        if let result = checkResult {
+            HStack(spacing: 10) {
+                Image(systemName: result.contains("新しい") ? "exclamationmark.triangle.fill" : "checkmark.seal.fill")
+                    .foregroundStyle(result.contains("新しい") ? PursueTheme.amber : PursueTheme.lime)
+                Text(result)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(PursueTheme.ink)
+                Spacer()
+            }
+            .padding()
+            .background(PursueTheme.panelHigh.opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(PursueTheme.lime.opacity(0.18), lineWidth: 1)
+            )
+        }
+    }
+
+    private var actionButtons: some View {
+        VStack(spacing: 10) {
+            Button {
+                checkNow()
+            } label: {
+                HStack {
+                    if isChecking {
+                        ProgressView()
+                            .tint(PursueTheme.void)
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                    Text(isChecking ? "巡回中..." : "今すぐ巡回")
+                        .fontWeight(.black)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(PursueTheme.lime, in: RoundedRectangle(cornerRadius: 8))
+                .foregroundStyle(PursueTheme.void)
+            }
+            .disabled(isChecking)
+
+            Button {
+                NotificationHelper.requestPermission()
+            } label: {
+                HStack {
+                    Image(systemName: "bell.badge")
+                    Text("通知を有効にする")
+                        .fontWeight(.bold)
+                }
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(PursueTheme.panel.opacity(0.9), in: RoundedRectangle(cornerRadius: 8))
+                .foregroundStyle(PursueTheme.lime)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(PursueTheme.lime.opacity(0.22), lineWidth: 1)
+                )
+            }
         }
     }
 
@@ -141,11 +147,7 @@ struct StatusView: View {
             await MainActor.run {
                 isChecking = false
                 lastCheck = ReleaseChecker.lastCheckDescription
-                if hasNew {
-                    checkResult = "新しい資料が公開されています！"
-                } else {
-                    checkResult = "現在の資料は最新です"
-                }
+                checkResult = hasNew ? "新しい資料が公開されています" : "現在の資料は最新です"
             }
         }
     }
@@ -157,20 +159,25 @@ struct StatusCard: View {
     let value: String
 
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
             Image(systemName: icon)
-                .foregroundStyle(.green)
-                .frame(width: 30)
+                .font(.headline)
+                .foregroundStyle(PursueTheme.lime)
+                .frame(width: 28)
             Text(title)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(PursueTheme.muted)
             Spacer()
             Text(value)
-                .font(.subheadline)
-                .foregroundStyle(.white)
+                .font(.system(.subheadline, design: .monospaced).weight(.bold))
+                .foregroundStyle(PursueTheme.ink)
+                .multilineTextAlignment(.trailing)
         }
         .padding()
-        .background(Color(red: 0.1, green: 0.1, blue: 0.15))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(.white.opacity(0.1), lineWidth: 1)
+        )
     }
 }

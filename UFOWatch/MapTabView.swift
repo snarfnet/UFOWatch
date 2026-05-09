@@ -21,34 +21,44 @@ struct MapTabView: View {
                             Button {
                                 selectedItem = item
                             } label: {
-                                ZStack {
-                                    Circle()
-                                        .fill(markerColor(for: item.category).opacity(0.3))
-                                        .frame(width: 36, height: 36)
-                                    Circle()
-                                        .fill(markerColor(for: item.category))
-                                        .frame(width: 16, height: 16)
-                                    Circle()
-                                        .stroke(.white, lineWidth: 2)
-                                        .frame(width: 16, height: 16)
-                                }
+                                MapMarker(category: item.category)
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
                 .mapStyle(.imagery(elevation: .realistic))
+                .ignoresSafeArea(edges: .bottom)
 
-                VStack {
+                Image("CinematicHero")
+                    .resizable()
+                    .scaledToFill()
+                    .opacity(0.22)
+                    .blendMode(.screen)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+
+                LinearGradient(
+                    colors: [PursueTheme.void.opacity(0.88), .clear, PursueTheme.void.opacity(0.78)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .allowsHitTesting(false)
+
+                VStack(spacing: 0) {
+                    coordinateHeader
                     Spacer()
                     legendView
-                        .padding(.bottom, 8)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 10)
                     BannerAdView()
                         .frame(height: 50)
                 }
             }
-            .navigationTitle("目撃マップ")
+            .navigationTitle("座標")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbarBackground(Color(red: 0.05, green: 0.05, blue: 0.1), for: .navigationBar)
+            .toolbarBackground(PursueTheme.void, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .sheet(item: $selectedItem) { item in
                 DetailView(item: item)
@@ -56,31 +66,84 @@ struct MapTabView: View {
         }
     }
 
-    private func markerColor(for category: UFOCategory) -> Color {
-        switch category {
-        case .fbiInfrared: return .red
-        case .fbiSketch: return .orange
-        case .nasa: return .blue
-        case .military: return .green
+    private var coordinateHeader: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "viewfinder")
+                .foregroundStyle(PursueTheme.lime)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("GLOBAL SIGHTING COORDINATES")
+                    .font(.system(size: 11, weight: .black, design: .monospaced))
+                    .foregroundStyle(PursueTheme.lime)
+                Text("タップで資料を開く")
+                    .font(.caption)
+                    .foregroundStyle(PursueTheme.muted)
+            }
+            Spacer()
+            Text("\(mappableItems.count)")
+                .font(.system(.headline, design: .monospaced).weight(.black))
+                .foregroundStyle(PursueTheme.ink)
         }
+        .padding(14)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(.white.opacity(0.12), lineWidth: 1)
+        )
+        .padding(16)
     }
 
     private var legendView: some View {
-        HStack(spacing: 12) {
-            ForEach(UFOCategory.allCases, id: \.self) { cat in
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(markerColor(for: cat))
-                        .frame(width: 8, height: 8)
-                    Text(cat.rawValue)
-                        .font(.caption2)
-                        .foregroundStyle(.white)
+        VStack(alignment: .leading, spacing: 10) {
+            Text("分類")
+                .font(.system(size: 10, weight: .black, design: .monospaced))
+                .foregroundStyle(PursueTheme.muted)
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 68), spacing: 8)], spacing: 8) {
+                ForEach(UFOCategory.allCases, id: \.self) { category in
+                    HStack(spacing: 5) {
+                        Circle()
+                            .fill(category.accentColor)
+                            .frame(width: 8, height: 8)
+                        Text(category.shortName)
+                            .font(.system(size: 10, weight: .black, design: .monospaced))
+                            .foregroundStyle(PursueTheme.ink)
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .frame(maxWidth: .infinity)
+                    .background(category.accentColor.opacity(0.18), in: RoundedRectangle(cornerRadius: 4))
                 }
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(.ultraThinMaterial)
-        .clipShape(Capsule())
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(.white.opacity(0.12), lineWidth: 1)
+        )
+    }
+}
+
+private struct MapMarker: View {
+    let category: UFOCategory
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(category.accentColor.opacity(0.24))
+                .frame(width: 44, height: 44)
+            Circle()
+                .stroke(category.accentColor.opacity(0.75), lineWidth: 1)
+                .frame(width: 32, height: 32)
+            Circle()
+                .fill(category.accentColor)
+                .frame(width: 12, height: 12)
+                .shadow(color: category.accentColor, radius: 8)
+            Image(systemName: "chevron.up")
+                .font(.system(size: 9, weight: .black))
+                .foregroundStyle(PursueTheme.void)
+                .offset(y: -1)
+        }
     }
 }
