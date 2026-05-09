@@ -35,7 +35,7 @@ struct StatusView: View {
                     }
                     .padding(.top, 30)
 
-                    Text("PURSUE監視システム")
+                    Text("PURSUE MONITOR")
                         .font(.headline)
                         .foregroundStyle(.green)
 

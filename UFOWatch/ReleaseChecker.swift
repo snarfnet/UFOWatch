@@ -77,7 +77,7 @@ struct NotificationHelper {
 
     static func sendNewReleaseNotification() {
         let content = UNMutableNotificationContent()
-        content.title = "UFOウォッチ"
+        content.title = "PURSUE"
         content.body = "新しいUAP資料が公開されました"
         content.sound = .default
 

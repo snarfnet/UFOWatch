@@ -5,7 +5,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>ja</string>
     <key>CFBundleDisplayName</key>
-    <string>UFOウォッチ</string>
+    <string>PURSUE</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>UFOウォッチ</string>
+    <string>PURSUE</string>
     <key>CFBundlePackageType</key>
     <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
     <key>CFBundleShortVersionString</key>
@@ -49,7 +49,7 @@
     <key>UIUserInterfaceStyle</key>
     <string>Dark</string>
     <key>GADApplicationIdentifier</key>
-    <string>ca-app-pub-9404799280370656~PLACEHOLDER</string>
+    <string>ca-app-pub-9404799280370656~9126277059</string>
     <key>SKAdNetworkItems</key>
     <array>
         <dict>

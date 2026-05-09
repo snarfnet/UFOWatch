@@ -36,7 +36,7 @@ struct TimelineView: View {
                 .padding(.vertical)
             }
             .background(Color(red: 0.05, green: 0.05, blue: 0.1))
-            .navigationTitle("UFOウォッチ")
+            .navigationTitle("PURSUE")
             .toolbarColorScheme(.dark, for: .navigationBar)
             .toolbarBackground(Color(red: 0.05, green: 0.05, blue: 0.1), for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)

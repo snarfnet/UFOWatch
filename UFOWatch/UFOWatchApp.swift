@@ -27,7 +27,7 @@ struct UFOWatchApp: App {
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        MobileAds.shared.start(completionHandler: nil)
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: "com.tokyonasu.UFOWatch.refresh",
             using: nil
